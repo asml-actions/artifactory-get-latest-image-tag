@@ -24,7 +24,7 @@ runs:
       shell: bash
       id: tag
       run: |
-        if [[ $ACTIONS_STEP_DEBUG == "true" ]]; then
+        if [ "$ACTIONS_STEP_DEBUG" == "true" ]; then
           curl --version
         fi
 
@@ -33,7 +33,7 @@ runs:
         response=$(curl $url --header "X-JFrog-Art-Api: ${ARTIFACTORY_TOKEN}" --show-error --fail)
         # note: after curl v 7.76.0 we can use the fail option below to get more info:
         # --fail-with-body
-        if [[ $ACTIONS_STEP_DEBUG == "true" ]]; then
+        if [[ "$ACTIONS_STEP_DEBUG" == "true" ]]; then
           echo "Found this response: "
           echo "$response"
         fi
