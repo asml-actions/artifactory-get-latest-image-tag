@@ -19,6 +19,11 @@ outputs:
     value: ${{ steps.tag.outputs.tag }}
 runs:
   using: composite
+  env:
+    ARTIFACTORY_URL: ${{ inputs.ARTIFACTORY_URL }}
+    REPO_KEY: ${{ inputs.REPO_KEY }}
+    IMAGE_NAME: ${{ inputs.IMAGE_NAME }}
+    ARTIFACTORY_TOKEN: ${{ inputs.ARTIFACTORY_TOKEN }}
   steps:
     - name: Load version from Artifactory
       shell: bash
