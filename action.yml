@@ -1,0 +1,44 @@
+name: Get latest image tag from Artifactory
+description: load the last updated image tag from Artifactory (excluding the 'latest' tag)
+inputs:
+  ARTIFACTORY_URL:
+    description: Url to the Artifactory server, including https
+    required: true
+  REPO_KEY:
+    description: Key of the Artifactory repository to search in
+    required: true 
+  IMAGE_NAME:
+    description: Name of the image to get the latest tag for
+    required: true
+  ARTIFACTORY_TOKEN:
+    description: API token to load the data with
+    required: true  
+outputs:
+  tag: 
+    description: The value of the last tag that was updated
+    value: ${{ steps.tag.outputs.tag }}
+runs:
+  using: composite
+  steps:
+    - name: Load version from Artifactory
+      shell: bash
+      id: tag
+      run: |
+        if [ $ACTIONS_STEP_DEBUG == "true" ]; then
+          curl --version
+        fi
+
+        echo "Calling Artifactory to load the latest version tag for the runner image"
+        response=$(curl '${ARTIFACTORY_URL}/api/docker/${REPO_KEY}/v2/${IMAGE_NAME}/tags/list' \
+              --header "X-JFrog-Art-Api: ${ARTIFACTORY_TOKEN}" --show-error --fail)
+        # note: after curl v 7.76.0 we can use the fail option below to get more info:
+        # --fail-with-body
+        if [ $ACTIONS_STEP_DEBUG == "true" ]; then
+          echo "Found this response: "
+          echo "$response"
+        fi
+
+        # load the previous to last item from the tags in the resonse
+        tag=$(echo $response | jq .tags[-2] -r)
+        echo "Found the last updated tag to be [$tag]"
+        echo "::set-output name=tag::$tag"
