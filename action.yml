@@ -21,7 +21,7 @@ runs:
   using: composite
   steps:
     - name: Load version from Artifactory
-      #shell: bash
+      shell: bash
       id: tag
       run: |
         if [[ $ACTIONS_STEP_DEBUG == "true" ]]; then
