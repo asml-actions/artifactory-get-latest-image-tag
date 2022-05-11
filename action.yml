@@ -28,12 +28,12 @@ runs:
           curl --version
         fi
 
-        echo "Calling Artifactory to load the latest version tag for the runner image"
-        response=$(curl '${ARTIFACTORY_URL}/api/docker/${REPO_KEY}/v2/${IMAGE_NAME}/tags/list' \
-              --header "X-JFrog-Art-Api: ${ARTIFACTORY_TOKEN}" --show-error --fail)
+        url='${ARTIFACTORY_URL}/api/docker/${REPO_KEY}/v2/${IMAGE_NAME}/tags/list'
+        echo "Calling Artifactory to load the latest version tag for the runner image through [$url]"
+        response=$(curl $url --header "X-JFrog-Art-Api: ${ARTIFACTORY_TOKEN}" --show-error --fail)
         # note: after curl v 7.76.0 we can use the fail option below to get more info:
         # --fail-with-body
-        if [ $ACTIONS_STEP_DEBUG == "true" ]; then
+        if [[ $ACTIONS_STEP_DEBUG == "true" ]]; then
           echo "Found this response: "
           echo "$response"
         fi
