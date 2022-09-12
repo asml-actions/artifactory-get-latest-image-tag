@@ -48,10 +48,13 @@ runs:
         fi
 
         if [[ "$PREFIX" != "" ]]; then
-          # filter the tags before searching for the last updated tag
           echo "Got this prefix to filter on: [$PREFIX]" 
           allTags=$(echo $response | jq .tags[] -r)
-          tag=$((IFS=$'\n' && echo "${allTags[*]}") | grep "^${PREFIX}" | tail -1)
+          if [[ "$ACTIONS_STEP_DEBUG" == "true" ]]; then
+            echo "Found these tags to filter with [$PREFIX]: "
+            echo "$allTags"
+          fi
+          tag=$( (IFS=$'\n' && echo "${allTags[*]}") | grep "^${PREFIX}" | tail -1)
           echo "Filtered: $tag"
         else 
             # load the previous to last item from the tags in the resonse
