@@ -13,6 +13,9 @@ inputs:
   ARTIFACTORY_TOKEN:
     description: API token to load the data with
     required: true  
+  PREFIX:
+    description: Filter the tags with this prefix before returning the last updated tag
+    required: false
 outputs:
   tag: 
     description: The value of the last tag that was updated
@@ -28,6 +31,7 @@ runs:
         REPO_KEY: ${{ inputs.REPO_KEY }}
         IMAGE_NAME: ${{ inputs.IMAGE_NAME }}
         ARTIFACTORY_TOKEN: ${{ inputs.ARTIFACTORY_TOKEN }}
+        PREFIX: ${{ inputs.PREFIX }}
       run: |
         if [[ "$ACTIONS_STEP_DEBUG" == "true" ]]; then
           curl --version
@@ -43,7 +47,15 @@ runs:
           echo "$response"
         fi
 
-        # load the previous to last item from the tags in the resonse
-        tag=$(echo $response | jq .tags[-2] -r)
+        if [[ "$PREFIX" != "" ]]; then
+          # filter the tags before searching for the last updated tag
+          echo "Got this prefix to filter on: [$PREFIX]" 
+          allTags=$(echo $response | jq .tags[] -r)
+          tag=$((IFS=$'\n' && echo "${allTags[*]}") | grep "^${PREFIX}" | tail -1)
+          echo "Filtered: $tag"
+        else 
+            # load the previous to last item from the tags in the resonse
+            tag=$(echo $response | jq .tags[-1] -r)
+        fi
         echo "Found the last updated tag to be [$tag]"
         echo "::set-output name=tag::$tag"
