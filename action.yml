@@ -39,7 +39,8 @@ runs:
 
         url="${ARTIFACTORY_URL}/api/docker/${REPO_KEY}/v2/${IMAGE_NAME}/tags/list"
         echo "Calling Artifactory to load the latest version tag for the runner image through [$url]"
-        response=$(curl $url --header "X-JFrog-Art-Api: ${ARTIFACTORY_TOKEN}" --show-error --fail)
+        # call started failing with the X-JFrog-Art-Api header in November 2022, so migrating to Authorization header
+        response=$(curl $url --header "Authorization: ${ARTIFACTORY_TOKEN}" --show-error --fail)
         # note: after curl v 7.76.0 we can use the fail option below to get more info:
         # --fail-with-body
         if [[ "$ACTIONS_STEP_DEBUG" == "true" ]]; then
